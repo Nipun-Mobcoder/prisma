@@ -22,7 +22,7 @@ class App {
 
   private initializeMiddlewares(): void {
     this.app.use(express.json());
-    this.app.use("/api", appRoutes);
+    this.app.use("/", appRoutes);
   }
 
   private handleGracefulShutdown(server: Server): void {
