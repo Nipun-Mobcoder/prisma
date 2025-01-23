@@ -42,8 +42,9 @@ export class UserController implements IUserController {
 
     try {
       const token = await this.userService.loginUser({
-          email, password,
-          name: null
+        email,
+        password,
+        name: null,
       });
       res.status(200).json({
         success: true,
@@ -63,28 +64,28 @@ export class UserController implements IUserController {
 
   profile = async (req: Request, res: Response) => {
     try {
-        const { authorization } = req.headers;
-        if (!authorization || !authorization.startsWith('Bearer ')) {
-            res.status(500).json({
-                success: false,
-                message: "Unauthorized",
-            })
-            return;
-          }
-        const profile = await this.userService.profile(authorization.substring(7));
-        res.status(200).json({
-            success: true,
-            profile
+      const { authorization } = req.headers;
+      if (!authorization || !authorization.startsWith("Bearer ")) {
+        res.status(500).json({
+          success: false,
+          message: "Unauthorized",
         });
+        return;
+      }
+      const profile = await this.userService.profile(authorization.substring(7));
+      res.status(200).json({
+        success: true,
+        profile,
+      });
     } catch (error) {
-        logger.error(error instanceof Error ? error?.message : "Looks like something went wrong.");
-        if (error instanceof Error) {
-            res.status(500).json({
-                success: false,
-                message: error?.message || "Internal server error",
-                error,
-            });
-        }
+      logger.error(error instanceof Error ? error?.message : "Looks like something went wrong.");
+      if (error instanceof Error) {
+        res.status(500).json({
+          success: false,
+          message: error?.message || "Internal server error",
+          error,
+        });
+      }
     }
-  }
+  };
 }

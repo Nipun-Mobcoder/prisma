@@ -10,5 +10,6 @@ const postController = new PostController(postService);
 
 postRoutes.route("/create").post(postController.createPost as RequestHandler);
 postRoutes.route("/show").get(postController.showPost as RequestHandler);
+postRoutes.route("/show/:id").get(postController.showComment as RequestHandler);
 
 export default postRoutes;

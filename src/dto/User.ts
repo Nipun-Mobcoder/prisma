@@ -1,3 +1,5 @@
+import { ModelPost } from "./Post";
+
 export interface IUser {
   name: string | null;
   email: string;
@@ -10,4 +12,6 @@ export interface ModelUser {
   id: number;
   name: string | null;
   created_at: Date;
+  post?: ModelPost[];
+  comment?: any;
 }

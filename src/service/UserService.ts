@@ -1,4 +1,4 @@
-import { IUser, ModelUser } from "@src/dto/IUser";
+import { IUser, ModelUser } from "@src/dto/User";
 import { IUserRepository } from "@src/repositories/UserRepositries";
 import bcrypt from "bcryptjs";
 
@@ -38,30 +38,30 @@ export class UserService implements IUserService {
 
   loginUser = async (data: IUser): Promise<string> => {
     try {
-        const user = await this.userRepository.findUser(data.email);
-        if(!user || !bcrypt.compareSync(data.password, user.password)) {
-            throw new Error("Given details are incorrect");
-        }
-        return this.userRepository.createToken(user);
-    } catch(error) {
-        if (error instanceof Error) {
-            throw new Error(error?.message || "Looks like something went wrong.");
-          }
-        throw new Error("An unexpected error occurred.");
+      const user = await this.userRepository.findUser(data.email);
+      if (!user || !bcrypt.compareSync(data.password, user.password)) {
+        throw new Error("Given details are incorrect");
+      }
+      return this.userRepository.createToken(user);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error?.message || "Looks like something went wrong.");
+      }
+      throw new Error("An unexpected error occurred.");
     }
-  }
+  };
 
   profile = async (token: string): Promise<ModelUser> => {
     try {
-        const data =  this.userRepository.fetchDetails(token);
-        const userDetails = await this.userRepository.findUser(data.email);
-        if(!userDetails) throw new Error("User not found.");
-        return userDetails;
-    } catch(error) {
-        if (error instanceof Error) {
-            throw new Error(error?.message || "Looks like something went wrong.");
-          }
-        throw new Error("An unexpected error occurred.");
+      const data = this.userRepository.fetchDetails(token);
+      const userDetails = await this.userRepository.findUser(data.email);
+      if (!userDetails) throw new Error("User not found.");
+      return userDetails;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error?.message || "Looks like something went wrong.");
+      }
+      throw new Error("An unexpected error occurred.");
     }
-  }
+  };
 }

@@ -1,22 +1,22 @@
 import { Request, Response } from "express";
 import { logger } from "@src/utils/logging";
-import { IPostService } from "@src/service/PostService";
+import { ICommentService } from "@src/service/CommentService";
 
-export interface IPostController {
-  createPost(req: Request, res: Response): Promise<void>;
-  showPost(req: Request, res: Response): Promise<void>;
-  showComment(req: Request, res: Response): Promise<void>;
+export interface ICommentController {
+  createComment(req: Request, res: Response): Promise<void>;
+  showComments(req: Request, res: Response): Promise<void>;
+  deleteComments(req: Request, res: Response): Promise<void>;
 }
 
-export class PostController implements IPostController {
-  private postService: IPostService;
+export class CommentController implements ICommentController {
+  private commentService: ICommentService;
 
-  constructor(postService: IPostService) {
-    this.postService = postService;
+  constructor(commentService: ICommentService) {
+    this.commentService = commentService;
   }
 
-  createPost = async (req: Request, res: Response) => {
-    const { description, title } = req.body;
+  createComment = async (req: Request, res: Response) => {
+    const { comment, post_id } = req.body;
     const { authorization } = req.headers;
     if (!authorization || !authorization.startsWith("Bearer ")) {
       res.status(500).json({
@@ -27,15 +27,15 @@ export class PostController implements IPostController {
     }
     try {
       const user_id = -1;
-      const userData = await this.postService.createPost({
+      const userData = await this.commentService.createComment({
         token: authorization.substring(7),
-        description,
-        title,
+        comment,
+        post_id,
         user_id,
       });
       res.status(200).json({
         success: true,
-        message: `Post ${title} created successfully`,
+        message: `Comment created successfully`,
         userData,
       });
     } catch (error) {
@@ -50,7 +50,7 @@ export class PostController implements IPostController {
     }
   };
 
-  showPost = async (req: Request, res: Response) => {
+  showComments = async (req: Request, res: Response) => {
     try {
       const { authorization } = req.headers;
       if (!authorization || !authorization.startsWith("Bearer ")) {
@@ -60,7 +60,7 @@ export class PostController implements IPostController {
         });
         return;
       }
-      const post = await this.postService.show(authorization.substring(7));
+      const post = await this.commentService.fetchAllComments(authorization.substring(7));
       res.status(200).json({
         success: true,
         post,
@@ -77,9 +77,9 @@ export class PostController implements IPostController {
     }
   };
 
-  showComment = async (req: Request, res: Response) => {
+  deleteComments = async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
+      const { comment_id } = req.body;
       const { authorization } = req.headers;
       if (!authorization || !authorization.startsWith("Bearer ")) {
         res.status(500).json({
@@ -88,10 +88,10 @@ export class PostController implements IPostController {
         });
         return;
       }
-      const post = await this.postService.showComments(Number(id));
+      const post = await this.commentService.delete(comment_id, authorization.substring(7));
       res.status(200).json({
         success: true,
-        ...post,
+        post,
       });
     } catch (error) {
       logger.error(error instanceof Error ? error?.message : "Looks like something went wrong.");
